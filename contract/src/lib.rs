@@ -1,58 +1,54 @@
-/*
- * This is an example of a Rust smart contract with two simple, symmetric functions:
- *
- * 1. set_greeting: accepts a greeting, such as "howdy", and records it for the user (account_id)
- *    who sent the request
- * 2. get_greeting: accepts an account_id and returns the greeting saved for it, defaulting to
- *    "Hello"
- *
- * Learn more about writing NEAR smart contracts with Rust:
- * https://github.com/near/near-sdk-rs
- *
- */
+// TODO turn on halt on warning
 
-// To conserve gas, efficient serialization is achieved through Borsh (http://borsh.io/)
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::{env, near_bindgen, setup_alloc};
 use near_sdk::collections::LookupMap;
 
 setup_alloc!();
 
-// Structs in Rust are similar to other languages, and may include impl keyword as shown below
-// Note: the names of the structs are not important when calling the smart contract, but the function names are
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize)]
-pub struct Welcome {
-    records: LookupMap<String, String>,
+pub struct Contract {
+    total_shares: u32,
+    shares_outstanding: u32,
+    share_ownership: LookupMap<String, u32>
 }
 
-impl Default for Welcome {
+impl Default for Contract {
   fn default() -> Self {
     Self {
-      records: LookupMap::new(b"a".to_vec()),
+      // TODO replace defaults with init parameters
+
+      // total shares issued by the company
+      total_shares: 1_000_000_000,
+
+      // shares outstanding in market, available to buy
+      shares_outstanding: 1_000_000_000,
+
+      // TODO: what does b"a" signify here?
+      // who has bought how many shares?
+      share_ownership: LookupMap::new(b"a"),
     }
   }
 }
 
 #[near_bindgen]
-impl Welcome {
-    pub fn set_greeting(&mut self, message: String) {
+impl Contract {
+    pub fn buy_shares(&mut self, new_shares: u32) {
         let account_id = env::signer_account_id();
 
-        // Use env::log to record logs permanently to the blockchain!
-        env::log(format!("Saving greeting '{}' for account '{}'", message, account_id,).as_bytes());
-
-        self.records.insert(&account_id, &message);
-    }
-
-    // `match` is similar to `switch` in other languages; here we use it to default to "Hello" if
-    // self.records.get(&account_id) is not yet defined.
-    // Learn more: https://doc.rust-lang.org/book/ch06-02-match.html#matching-with-optiont
-    pub fn get_greeting(&self, account_id: String) -> String {
-        match self.records.get(&account_id) {
-            Some(greeting) => greeting,
-            None => "Hello".to_string(),
+        if new_shares > self.shares_outstanding {
+            panic!("Cannot buy more shares ({}) than available ({}).", new_shares, self.shares_outstanding);
         }
+
+        let current_shares = self.share_ownership.get(&account_id).unwrap_or_default();
+        let new_total = current_shares + new_shares;
+        self.share_ownership.insert(&account_id, &new_total);
+        self.shares_outstanding -= new_shares;
+
+        env::log(format!("Account '{}' bought {} shares successfully.", account_id, new_shares).as_bytes());
+        env::log(format!("Account '{}' now owns {} shares.", account_id, new_total).as_bytes());
+        env::log(format!("New outstanding shares available to buy: {}", self.shares_outstanding).as_bytes());
     }
 }
 
@@ -96,26 +92,12 @@ mod tests {
     }
 
     #[test]
-    fn set_then_get_greeting() {
+    fn buy_shares() {
         let context = get_context(vec![], false);
         testing_env!(context);
-        let mut contract = Welcome::default();
-        contract.set_greeting("howdy".to_string());
-        assert_eq!(
-            "howdy".to_string(),
-            contract.get_greeting("bob_near".to_string())
-        );
-    }
-
-    #[test]
-    fn get_default_greeting() {
-        let context = get_context(vec![], true);
-        testing_env!(context);
-        let contract = Welcome::default();
-        // this test did not call set_greeting so should return the default "Hello" greeting
-        assert_eq!(
-            "Hello".to_string(),
-            contract.get_greeting("francis.near".to_string())
-        );
+        let mut contract = Contract::default();
+        
+        // successful buy
+        contract.buy_shares(1_000_000_000);
     }
 }
