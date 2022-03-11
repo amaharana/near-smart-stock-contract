@@ -1,10 +1,14 @@
 // TODO turn on halt on warning
 
+use near_sdk::Promise;
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::{env, near_bindgen, setup_alloc};
 use near_sdk::collections::LookupMap;
 
 setup_alloc!();
+
+// conversion factor from NEAR token to yoctoNear units
+pub const YOCTO_MULTIPLIER: u128 = 1_000_000_000_000_000_000_000_000;
 
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize)]
@@ -12,6 +16,11 @@ pub struct Contract {
     ticker: String,
     total_shares: u32,
     shares_outstanding: u32,
+    
+    // NEAR tokens required to buy one share
+    // TODO: Fetch current FIAT price using chainlink oracle and convert to NEAR tokens
+    price_per_share: u32,
+    
     share_ownership: LookupMap<String, u32>
 }
 
@@ -28,6 +37,8 @@ impl Default for Contract {
       // shares outstanding in market, available to buy
       shares_outstanding: 1_000_000_000,
 
+      price_per_share: 2,
+
       // TODO: what does b"a" signify here?
       // who has bought how many shares?
       share_ownership: LookupMap::new(b"a"),
@@ -37,11 +48,16 @@ impl Default for Contract {
 
 #[near_bindgen]
 impl Contract {
+    #[payable]
     pub fn buy_shares(&mut self, num_shares: u32) {
         let account_id = env::signer_account_id();
 
         if num_shares > self.shares_outstanding  || num_shares == 0 {
             panic!("ERR_INVALID_BUY_QUANTITY");
+        }
+
+        if env::attached_deposit() < u128::from(num_shares) * YOCTO_MULTIPLIER * u128::from(self.price_per_share) {
+            panic!("ERR_INSUFFICIENT_DEPOSIT");
         }
 
         let current_shares = self.share_ownership.get(&account_id).unwrap_or_default();
@@ -54,8 +70,10 @@ impl Contract {
         env::log(format!("New outstanding {} shares available to buy: {}", self.ticker, self.shares_outstanding).as_bytes());
     }
 
-    pub fn sell_shares(&mut self, num_shares: u32) {
+    pub fn sell_shares(&mut self, num_shares: u32) -> Promise {
         let account_id = env::signer_account_id();
+        let same_account_id = env::signer_account_id();
+
         let current_shares = self.share_ownership.get(&account_id).unwrap_or_default();
 
         if num_shares > current_shares  || num_shares == 0 {
@@ -63,12 +81,19 @@ impl Contract {
         }
 
         let new_total = current_shares - num_shares;
+        let sale_proceeds = u128::from(num_shares * self.price_per_share) * YOCTO_MULTIPLIER;
+
         self.share_ownership.insert(&account_id, &new_total);
         self.shares_outstanding += num_shares;
 
+        // TODO: Shouldn't this be displayed only after the transfer Promise has completed successfully? How do we check/get notified when the promise executes successfully?
         env::log(format!("Account {} sold {} {} shares successfully.", account_id, self.ticker, num_shares).as_bytes());
         env::log(format!("Account {} now owns {} {} shares.", account_id, self.ticker, new_total).as_bytes());
         env::log(format!("New outstanding {} shares available to buy: {}", self.ticker, self.shares_outstanding).as_bytes());
+
+        // TODO: What about gas? Should the gas be subtracted from sale proceeds and passed to this promise?
+        // TODO: "Lock" these funds somehow until the promise is executed successfully. How do we check/get notified when the promise executes successfully?
+        Promise::new(same_account_id).transfer(sale_proceeds)
     }
 
     pub fn get_shares_outstanding(&self) -> u32 {
@@ -82,6 +107,10 @@ impl Contract {
     pub fn get_shares_owned(&self) -> u32 {
         let account_id = env::signer_account_id();
         self.share_ownership.get(&account_id).unwrap_or_default()
+    }
+
+    pub fn get_price_per_share(&self) -> u32 {
+        self.price_per_share
     }
 }
 
@@ -137,9 +166,10 @@ mod tests {
 
     #[test]
     fn buy_shares_successfully() {
-        let context = get_context(vec![], false);
-        testing_env!(context);
+        let mut context = get_context(vec![], false);
         let mut contract = Contract::default();
+        context.attached_deposit = u128::from(contract.get_price_per_share()) * YOCTO_MULTIPLIER * 420;
+        testing_env!(context);
 
         // haven't bought anything yet
         assert_eq!(contract.get_shares_owned(), 0);
@@ -155,9 +185,10 @@ mod tests {
     #[test]
     #[should_panic(expected = "ERR_INVALID_SELL_QUANTITY")]
     fn sell_shares_more_than_owned() {
-        let context = get_context(vec![], false);
-        testing_env!(context);
+        let mut context = get_context(vec![], false);
         let mut contract = Contract::default();
+        context.attached_deposit = u128::from(contract.get_price_per_share()) * YOCTO_MULTIPLIER * 290;
+        testing_env!(context);
         
         contract.buy_shares(290);
         contract.sell_shares(291);
@@ -165,9 +196,10 @@ mod tests {
 
     #[test]
     fn sell_shares_successfully() {
-        let context = get_context(vec![], false);
-        testing_env!(context);
+        let mut context = get_context(vec![], false);
         let mut contract = Contract::default();
+        context.attached_deposit = u128::from(contract.get_price_per_share()) * YOCTO_MULTIPLIER * 286;
+        testing_env!(context);
         
         contract.buy_shares(20);
         contract.buy_shares(81);
@@ -177,5 +209,7 @@ mod tests {
         
         let expected_shares_outstanding = contract.get_total_shares() - 234;
         assert_eq!(contract.get_shares_outstanding(), expected_shares_outstanding);
+
+        // TODO: insert check that sale proceeds were transferred to caller successfully
     }
 }
