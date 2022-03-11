@@ -34,19 +34,36 @@ impl Default for Contract {
 
 #[near_bindgen]
 impl Contract {
-    pub fn buy_shares(&mut self, new_shares: u32) {
+    pub fn buy_shares(&mut self, num_shares: u32) {
         let account_id = env::signer_account_id();
 
-        if new_shares > self.shares_outstanding  || new_shares == 0 {
+        if num_shares > self.shares_outstanding  || num_shares == 0 {
             panic!("ERR_INVALID_BUY_QUANTITY");
         }
 
         let current_shares = self.share_ownership.get(&account_id).unwrap_or_default();
-        let new_total = current_shares + new_shares;
+        let new_total = current_shares + num_shares;
         self.share_ownership.insert(&account_id, &new_total);
-        self.shares_outstanding -= new_shares;
+        self.shares_outstanding -= num_shares;
 
-        env::log(format!("Account '{}' bought {} shares successfully.", account_id, new_shares).as_bytes());
+        env::log(format!("Account '{}' bought {} shares successfully.", account_id, num_shares).as_bytes());
+        env::log(format!("Account '{}' now owns {} shares.", account_id, new_total).as_bytes());
+        env::log(format!("New outstanding shares available to buy: {}", self.shares_outstanding).as_bytes());
+    }
+
+    pub fn sell_shares(&mut self, num_shares: u32) {
+        let account_id = env::signer_account_id();
+        let current_shares = self.share_ownership.get(&account_id).unwrap_or_default();
+
+        if num_shares > current_shares  || num_shares == 0 {
+            panic!("ERR_INVALID_SELL_QUANTITY");
+        }
+
+        let new_total = current_shares - num_shares;
+        self.share_ownership.insert(&account_id, &new_total);
+        self.shares_outstanding += num_shares;
+
+        env::log(format!("Account '{}' sold {} shares successfully.", account_id, num_shares).as_bytes());
         env::log(format!("Account '{}' now owns {} shares.", account_id, new_total).as_bytes());
         env::log(format!("New outstanding shares available to buy: {}", self.shares_outstanding).as_bytes());
     }
@@ -129,6 +146,33 @@ mod tests {
         assert_eq!(contract.get_shares_owned(), 420);
         
         let expected_shares_outstanding = contract.get_total_shares() - 420;
-        assert_eq!(expected_shares_outstanding, contract.get_shares_outstanding());
+        assert_eq!(contract.get_shares_outstanding(), expected_shares_outstanding);
+    }
+
+    #[test]
+    #[should_panic(expected = "ERR_INVALID_SELL_QUANTITY")]
+    fn sell_shares_more_than_owned() {
+        let context = get_context(vec![], false);
+        testing_env!(context);
+        let mut contract = Contract::default();
+        
+        contract.buy_shares(290);
+        contract.sell_shares(291);
+    }
+
+    #[test]
+    fn sell_shares_successfully() {
+        let context = get_context(vec![], false);
+        testing_env!(context);
+        let mut contract = Contract::default();
+        
+        contract.buy_shares(20);
+        contract.buy_shares(81);
+        contract.buy_shares(185);
+        contract.sell_shares(52);
+        assert_eq!(contract.get_shares_owned(), 234);
+        
+        let expected_shares_outstanding = contract.get_total_shares() - 234;
+        assert_eq!(contract.get_shares_outstanding(), expected_shares_outstanding);
     }
 }
