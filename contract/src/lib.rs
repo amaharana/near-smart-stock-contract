@@ -9,6 +9,7 @@ setup_alloc!();
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize)]
 pub struct Contract {
+    ticker: String,
     total_shares: u32,
     shares_outstanding: u32,
     share_ownership: LookupMap<String, u32>
@@ -18,6 +19,8 @@ impl Default for Contract {
   fn default() -> Self {
     Self {
       // TODO replace defaults with init parameters
+
+      ticker: String::from("MYCOMPANY"),
 
       // total shares issued by the company
       total_shares: 1_000_000_000,
@@ -46,9 +49,9 @@ impl Contract {
         self.share_ownership.insert(&account_id, &new_total);
         self.shares_outstanding -= num_shares;
 
-        env::log(format!("Account '{}' bought {} shares successfully.", account_id, num_shares).as_bytes());
-        env::log(format!("Account '{}' now owns {} shares.", account_id, new_total).as_bytes());
-        env::log(format!("New outstanding shares available to buy: {}", self.shares_outstanding).as_bytes());
+        env::log(format!("Account {} bought {} {} shares successfully.", account_id, num_shares, self.ticker).as_bytes());
+        env::log(format!("Account {} now owns {} {} shares.", account_id, new_total, self.ticker).as_bytes());
+        env::log(format!("New outstanding {} shares available to buy: {}", self.ticker, self.shares_outstanding).as_bytes());
     }
 
     pub fn sell_shares(&mut self, num_shares: u32) {
@@ -63,9 +66,9 @@ impl Contract {
         self.share_ownership.insert(&account_id, &new_total);
         self.shares_outstanding += num_shares;
 
-        env::log(format!("Account '{}' sold {} shares successfully.", account_id, num_shares).as_bytes());
-        env::log(format!("Account '{}' now owns {} shares.", account_id, new_total).as_bytes());
-        env::log(format!("New outstanding shares available to buy: {}", self.shares_outstanding).as_bytes());
+        env::log(format!("Account {} sold {} {} shares successfully.", account_id, self.ticker, num_shares).as_bytes());
+        env::log(format!("Account {} now owns {} {} shares.", account_id, self.ticker, new_total).as_bytes());
+        env::log(format!("New outstanding {} shares available to buy: {}", self.ticker, self.shares_outstanding).as_bytes());
     }
 
     pub fn get_shares_outstanding(&self) -> u32 {
