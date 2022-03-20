@@ -22,6 +22,10 @@ pub struct Contract {
   price_per_share: u32,
 
   share_ownership: LookupMap<String, u32>,
+
+  // account id of multisig contract that will be authorised to perform privileged actions 
+  // such as issue new shares and buy-backs
+  allowed_admin_caller: String
 }
 
 impl Default for Contract {
@@ -33,17 +37,26 @@ impl Default for Contract {
 #[near_bindgen]
 impl Contract {
   #[init]
-  pub fn new(ticker: String, total_shares: u32, price_per_share: u32) -> Self {
+  pub fn new(ticker: String, total_shares: u32, price_per_share: u32, allowed_admin_caller: String) -> Self {
     assert!(!env::state_exists(), "ALREADY_INITIALIZED");
+
+    // When creating the contract account using a JS script run by `near repl`, init cannot be called.
+    // The contract account's keys are not on the local machine, and the master account that created the 
+    // contract account cannot invoke init due to this check. Since init will usually be called right 
+    // after contract creation, this check is not really necessary as the window of risk if too small.
+    // Disabling the check allows to enable deployment and init using `near repl` script.
+    //
+    /*
     assert!(
       env::current_account_id() == env::signer_account_id(),
       "INIT_ONLY_BY_OWNER"
     );
+    */
 
     Self {
-      ticker: ticker,
-      total_shares: total_shares,
-      price_per_share: price_per_share,
+      ticker,
+      total_shares,
+      price_per_share,
 
       // nothing has been sold yet
       shares_outstanding: total_shares,
@@ -51,6 +64,8 @@ impl Contract {
       // TODO: what does b"a" signify here?
       // to keep track of who has bought how many shares
       share_ownership: LookupMap::new(b"a"),
+
+      allowed_admin_caller,
     }
   }
 
@@ -139,6 +154,26 @@ impl Contract {
     Promise::new(same_account_id).transfer(sale_proceeds)
   }
 
+  pub fn issue_new_shares(&mut self, num_new_shares: u32) {
+    self.verify_caller();
+
+    // TODO: detect possible overflow before executing
+    // TODO: price per share should change when new shares are issued
+    self.total_shares += num_new_shares;
+    self.shares_outstanding += num_new_shares;
+  }
+
+  pub fn buy_back_shares(&mut self, num_shares_to_buy: u32) {
+    self.verify_caller();
+
+    // TODO: detect possible overflow before executing
+    // TODO: price per share should change during share buy-back
+    assert!(num_shares_to_buy <= self.shares_outstanding, "Cannot buy back more than outstanding shares");
+
+    self.shares_outstanding -= num_shares_to_buy;
+    self.total_shares -= num_shares_to_buy;
+  }
+
   pub fn get_shares_outstanding(&self) -> u32 {
     self.shares_outstanding
   }
@@ -154,6 +189,11 @@ impl Contract {
 
   pub fn get_price_per_share(&self) -> u32 {
     self.price_per_share
+  }
+
+  fn verify_caller(&self) {
+    assert!(self.allowed_admin_caller == env::signer_account_id(), 
+      "Privileged method can only be invoked by authorized multisig contract");
   }
 }
 
@@ -207,6 +247,7 @@ mod tests {
     Contract::default();
   }
 
+  /*
   #[test]
   #[should_panic(expected = "INIT_ONLY_BY_OWNER")]
   fn init_by_non_owner() {
@@ -214,15 +255,16 @@ mod tests {
     context.signer_account_id = "bob_near".to_string();
     testing_env!(context);
 
-    Contract::new("MYCOMPANY".to_string(), 1_000_000_000, 2);
+    Contract::new("MYCOMPANY".to_string(), 1_000_000_000, 2, "".to_string());
   }
+  */
 
   #[test]
   #[should_panic(expected = "ERR_INVALID_BUY_QUANTITY")]
   fn buy_shares_more_than_outstanding() {
     let context = get_context(vec![], false);
     testing_env!(context);
-    let mut contract = Contract::new("MYCOMPANY".to_string(), 1_000_000_000, 2);
+    let mut contract = Contract::new("MYCOMPANY".to_string(), 1_000_000_000, 2, "".to_string());
     let buy_quantity = contract.get_shares_outstanding() + 1;
 
     contract.buy_shares(buy_quantity);
@@ -233,7 +275,7 @@ mod tests {
     let mut context = get_context(vec![], false);
     context.attached_deposit = 2 * YOCTO_MULTIPLIER * 420;
     testing_env!(context);
-    let mut contract = Contract::new("MYCOMPANY".to_string(), 1_000_000_000, 2);
+    let mut contract = Contract::new("MYCOMPANY".to_string(), 1_000_000_000, 2, "".to_string());
 
     // haven't bought anything yet
     assert_eq!(contract.get_shares_owned(), 0);
@@ -255,7 +297,7 @@ mod tests {
     let mut context = get_context(vec![], false);
     context.attached_deposit = 2 * YOCTO_MULTIPLIER * 290;
     testing_env!(context);    
-    let mut contract = Contract::new("MYCOMPANY".to_string(), 1_000_000_000, 2);
+    let mut contract = Contract::new("MYCOMPANY".to_string(), 1_000_000_000, 2, "".to_string());
 
     contract.buy_shares(290);
     contract.sell_shares(291);
@@ -266,7 +308,7 @@ mod tests {
     let mut context = get_context(vec![], false);
     context.attached_deposit = 2 * YOCTO_MULTIPLIER * 286;
     testing_env!(context);
-    let mut contract = Contract::new("MYCOMPANY".to_string(), 1_000_000_000, 2);
+    let mut contract = Contract::new("MYCOMPANY".to_string(), 1_000_000_000, 2, "".to_string());
 
     contract.buy_shares(20);
     contract.buy_shares(81);
