@@ -192,8 +192,8 @@ impl Contract {
   }
 
   fn verify_caller(&self) {
-    assert!(self.allowed_admin_caller == env::signer_account_id(), 
-      "Privileged method can only be invoked by authorized multisig contract");
+    assert!(self.allowed_admin_caller == env::predecessor_account_id(), 
+      "Privileged method can only be invoked by authorized multisig contract as the predecessor");
   }
 }
 
