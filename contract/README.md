@@ -1,7 +1,7 @@
 near-smart-stock-contract Smart Contract
 ==================
 
-A [smart contract] written in [Rust] for an app initialized with [create-near-app]
+A [smart contract] written in [Rust] to simulate buying and selling shares of an imaginary company. Disclaimer: Learning exercise, not meant for real trading.
 
 
 Quick Start
@@ -15,10 +15,11 @@ Exploring The Code
 
 1. The main smart contract code lives in `src/lib.rs`. You can compile it with
    the `./compile` script.
-2. Tests: You can run smart contract tests with the `./test` script. This runs
-   standard Rust tests using [cargo] with a `--nocapture` flag so that you
+2. Tests: You can run smart contract unit tests with the using the command below. It runs standard Rust tests using [cargo] with a `--nocapture` flag so that you
    can see any debug info you print to the console.
-
+   ```
+   cargo test -- --nocapture
+   ```
 
   [smart contract]: https://docs.near.org/docs/develop/contracts/overview
   [Rust]: https://www.rust-lang.org/
