@@ -8,7 +8,7 @@ investor_account=$3.$1
 
 # Demo admin users who can issue new shares, buy-back existing shares, and perform other "admin" functions
 near create-account $admin_account --masterAccount $master_account
-near send $master_account $admin_account 300
+near send $master_account $admin_account 400
 near create-account admin1.$admin_account --masterAccount $admin_account
 near create-account admin2.$admin_account --masterAccount $admin_account
 near create-account admin3.$admin_account --masterAccount $admin_account

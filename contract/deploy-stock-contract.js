@@ -1,16 +1,27 @@
+const { exit } = require('process');
+const fs = require('fs');
+
 /**
  * Run from project root directory:
- *      near repl -s ./contract/deploy-stock-contract.js
+ *      near repl -s ./contract/deploy-stock-contract.js -- company-a.mtestaccount.testnet multisig.commpany-a.mtestaccount.testnet
  */
 
-const fs = require('fs');
-const deployerAccountName = "company1.mtestaccount.testnet";
-const contractName = "stockcontract2.company1.mtestaccount.testnet";
+var arguments = process.argv ;
+// console.log("# arguments: " + arguments.length);
+// arguments.forEach(arg => console.log(arg));
+
+// first arg is path to "node", second arg is path to "near" and so on...
+if (arguments.length != 8) {
+    console.log("USAGE: near repl -s ./contract/deploy-stock-contract.js -- <deployment_account_id> <multisig_account_id>");
+}
+
+const deployerAccountName = arguments[6]; // "company-a.mtestaccount.testnet";
+const contractName = "stockcontract." + deployerAccountName; //stockcontract.company-a.mtestaccount.testnet";
 const initArgs = {
-    "ticker": "company1",
-    "total_shares": 10000,
+    "ticker": "MYCOMPANY",
+    "total_shares": 100000,
     "price_per_share": 2,
-    "allowed_admin_caller": "multisig.company1.mtestaccount.testnet"
+    "allowed_admin_caller": arguments[7]
 };
 
 exports.main = async function(context) {
