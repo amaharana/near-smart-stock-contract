@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2022-03-25T04:48:08.665Z" agent="5.0 (Macintosh)" etag="uJRczRH4Kb8VQz7kze36" version="17.2.2" type="github">
+<mxfile host="app.diagrams.net" modified="2022-03-25T13:19:53.305Z" agent="5.0 (Macintosh)" etag="0GRfDYyZOyyY1N2nIqFM" version="17.2.2" type="github">
   <diagram id="-hN-MSK7Q1_RvColJM6n" name="Page-1">
-    <mxGraphModel dx="1623" dy="3166" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1623" dy="3129" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -103,7 +103,7 @@
         <mxCell id="6cK30qrrgWEB5mEtdJcq-16" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://g.foolcdn.com/art/companylogos/square/link.png;dashed=1;dashPattern=1 2;" vertex="1" parent="1">
           <mxGeometry x="526" y="-530" width="100" height="100" as="geometry" />
         </mxCell>
-        <mxCell id="6cK30qrrgWEB5mEtdJcq-17" value="Oracle: Price feed" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;dashed=1;dashPattern=1 2;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Oci5rgU2LHDsX-qW9czk-2" target="6cK30qrrgWEB5mEtdJcq-29">
+        <mxCell id="6cK30qrrgWEB5mEtdJcq-17" value="Oracle: Price feed" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;dashed=1;dashPattern=1 2;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;startArrow=block;startFill=1;" edge="1" parent="1" source="Oci5rgU2LHDsX-qW9czk-2" target="6cK30qrrgWEB5mEtdJcq-29">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="580" y="-560" as="targetPoint" />
           </mxGeometry>
