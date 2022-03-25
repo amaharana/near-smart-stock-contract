@@ -14,11 +14,13 @@ export default function App() {
   const [sharesOwned, setSharesOwned] = React.useState()
   const [sharesOutstanding, setSharesOutstanding] = React.useState()
 
-  // when the user has not yet interacted with the form, disable the button
-  const [buttonDisabled, setButtonDisabled] = React.useState(true)
+  // toggle this flag to indicate that contract data has changed 
+  // and all on-screen representations should be re-rendered
+  const [contractCallRefreshFlag, setContractCallRefreshFlag] = React.useState()
 
-  // The useEffect hook can be used to fire side-effects during render
-  // Learn more: https://reactjs.org/docs/hooks-intro.html
+  // when the user has not yet interacted with the form, disable the button
+  const [formsDisabled, setFormsDisabled] = React.useState(false)
+
   React.useEffect(
     () => {
       // in this case, we only care to query the contract when signed in
@@ -44,9 +46,16 @@ export default function App() {
     },
 
     // The second argument to useEffect tells React when to re-run the effect
-    // Use an empty array to specify "only run on first render"
-    // This works because signing into NEAR Wallet reloads the page
-    []
+    // Use an empty array to specify "only run on first render".
+    // Pass a variable to specify "run when this variable state changes."
+    [contractCallRefreshFlag]
+  )
+
+  React.useEffect(
+    () => {
+      fieldsetForBuy.disabled = formsDisabled
+      fieldsetForSell.disabled = formsDisabled
+    }, [formsDisabled]
   )
 
   // if not signed in, return early with sign-in prompt
@@ -83,30 +92,32 @@ export default function App() {
       <main>
         <h1>
           {' '/* React trims whitespace around tags; insert literal space character when needed */}
-          {window.accountId}!
+          Welcome {window.accountId}!
         </h1>
         <form onSubmit={async event => {
           event.preventDefault()
 
           // get elements from the form using their id attribute
-          const { fieldset, sharesToBuy } = event.target.elements
+          const { fieldsetForBuy, sharesToBuy } = event.target.elements
 
           // hold onto new user-entered value from React's SynthenticEvent for use after `await` call
           const numSharesToBuy = parseInt(sharesToBuy.value)
 
-          // disable the form while the value gets updated on-chain
-          fieldset.disabled = true
+          // disable the forms while the value gets updated on-chain
+          setFormsDisabled(true)
 
           // TODO: Does not work :(
           try {
             const buyCost = ONE_NEAR.muln(pricePerShare).muln(numSharesToBuy);
             const gas = new BN('30000000000000');
-            
+
             // make an update call to the smart contract
             await window.contract.buy_shares({
               // pass the number of shares that the user entered in the form
               num_shares: numSharesToBuy
             }, gas, buyCost)
+
+            // Don't need to toggle 'contractCallRefreshFlag' since buy involves a apage reload
           } catch (e) {
             alert(
               'Something went wrong! ' +
@@ -115,11 +126,11 @@ export default function App() {
             )
             throw e
           } finally {
-            // re-enable the form, whether the call succeeded or failed
-            fieldset.disabled = false
+            // re-enable the forms, whether the call succeeded or failed
+            setFormsDisabled(false)
           }
         }}>
-          <fieldset id="fieldset">
+          <fieldset id="fieldsetForBuy">
             <label
               htmlFor="sharesToBuy"
               style={{
@@ -133,13 +144,10 @@ export default function App() {
             <div style={{ display: 'flex' }}>
               <input
                 autoComplete="off"
-                defaultValue={pricePerShare}
                 id="sharesToBuy"
-                onChange={e => setButtonDisabled(e.target.value === pricePerShare)}
                 style={{ flex: 1 }}
               />
               <button
-                disabled={buttonDisabled}
                 style={{ borderRadius: '0 5px 5px 0' }}
               >
                 Buy
@@ -148,21 +156,87 @@ export default function App() {
           </fieldset>
         </form>
 
+        <form onSubmit={async event => {
+          event.preventDefault()
+
+          // get elements from the form using their id attribute
+          const { fieldsetForSell, sharesToSell } = event.target.elements
+
+          // hold onto new user-entered value from React's SynthenticEvent for use after `await` call
+          const numSharesToSell = parseInt(sharesToSell.value)
+
+          // disable the forms while the value gets updated on-chain
+          setFormsDisabled(true)
+
+          // TODO: Does not work :(
+          try {
+            const gas = new BN('30000000000000');
+
+            // make an update call to the smart contract
+            await window.contract.sell_shares({
+              // pass the number of shares that the user entered in the form
+              num_shares: numSharesToSell
+            }, gas, "0")
+
+            setContractCallRefreshFlag(!contractCallRefreshFlag)
+          } catch (e) {
+            alert(
+              'Something went wrong! ' + e
+            )
+            throw e
+          } finally {
+            // re-enable the forms, whether the call succeeded or failed
+            setFormsDisabled(false)
+          }
+        }}>
+          <fieldset id="fieldsetForSell">
+            <label
+              htmlFor="sharesToSell"
+              style={{
+                display: 'block',
+                color: 'var(--gray)',
+                marginBottom: '0.5em'
+              }}
+            >
+              Number of shares to sell
+            </label>
+            <div style={{ display: 'flex' }}>
+              <input
+                autoComplete="off"
+                id="sharesToSell"
+                style={{ flex: 1 }}
+              />
+              <button
+                style={{ borderRadius: '0 5px 5px 0' }}
+              >
+                Sell
+              </button>
+            </div>
+          </fieldset>
+        </form>
+
+
         <table>
-          <tr>
-            <td>Shares owned by {window.accountId}</td>
-            <td>{sharesOwned}</td>
-          </tr>
-          <tr>
-            <td>Shares available to buy</td>
-            <td>{sharesOutstanding}</td>
-          </tr>
-          <tr>
-            <td>Price per share</td>
-            <td>{pricePerShare}</td>
-          </tr>
+          <tbody>
+            <tr>
+              <td>Shares owned by {window.accountId}</td>
+              <td>{sharesOwned}</td>
+            </tr>
+            <tr>
+              <td>Shares available to buy</td>
+              <td>{sharesOutstanding}</td>
+            </tr>
+            <tr>
+              <td>Price per share</td>
+              <td>{pricePerShare}</td>
+            </tr>
+          </tbody>
         </table>
       </main>
     </>
   )
+
+  function disableForms() {
+    console.log("test")
+  }
 }

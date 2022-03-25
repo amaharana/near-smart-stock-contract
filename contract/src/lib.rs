@@ -182,8 +182,7 @@ impl Contract {
     self.total_shares
   }
 
-  pub fn get_shares_owned(&self) -> u32 {
-    let account_id = env::signer_account_id();
+  pub fn get_shares_owned(&self, account_id: &String) -> u32 {
     self.share_ownership.get(&account_id).unwrap_or_default()
   }
 
@@ -274,15 +273,15 @@ mod tests {
   fn buy_shares_successfully() {
     let mut context = get_context(vec![], false);
     context.attached_deposit = 2 * YOCTO_MULTIPLIER * 420;
-    testing_env!(context);
+    testing_env!(context.clone());
     let mut contract = Contract::new("MYCOMPANY".to_string(), 1_000_000_000, 2, "".to_string());
 
     // haven't bought anything yet
-    assert_eq!(contract.get_shares_owned(), 0);
+    assert_eq!(contract.get_shares_owned(&context.signer_account_id), 0);
 
     contract.buy_shares(20);
     contract.buy_shares(400);
-    assert_eq!(contract.get_shares_owned(), 420);
+    assert_eq!(contract.get_shares_owned(&context.signer_account_id), 420);
 
     let expected_shares_outstanding = contract.get_total_shares() - 420;
     assert_eq!(
@@ -296,7 +295,7 @@ mod tests {
   fn sell_shares_more_than_owned() {
     let mut context = get_context(vec![], false);
     context.attached_deposit = 2 * YOCTO_MULTIPLIER * 290;
-    testing_env!(context);    
+    testing_env!(context.clone());    
     let mut contract = Contract::new("MYCOMPANY".to_string(), 1_000_000_000, 2, "".to_string());
 
     contract.buy_shares(290);
@@ -307,14 +306,14 @@ mod tests {
   fn sell_shares_successfully() {
     let mut context = get_context(vec![], false);
     context.attached_deposit = 2 * YOCTO_MULTIPLIER * 286;
-    testing_env!(context);
+    testing_env!(context.clone());
     let mut contract = Contract::new("MYCOMPANY".to_string(), 1_000_000_000, 2, "".to_string());
 
     contract.buy_shares(20);
     contract.buy_shares(81);
     contract.buy_shares(185);
     contract.sell_shares(52);
-    assert_eq!(contract.get_shares_owned(), 234);
+    assert_eq!(contract.get_shares_owned(&context.signer_account_id), 234);
 
     let expected_shares_outstanding = contract.get_total_shares() - 234;
     assert_eq!(
