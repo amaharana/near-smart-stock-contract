@@ -29,6 +29,7 @@ There are 3 main components of the solution (2 in this package and 1 external):
 
 3. dApp: This React web application provides the UI for interacting with SSC. In future, it can be extended to provide admin operations that involve MSC.
 
+![High Level Architecture Diagram](https://viewer.diagrams.net/?tags=%7B%7D&highlight=0000ff&edit=_blank&layers=1&nav=1&title=HighLevelArchitecture.drawio#Uhttps%3A%2F%2Fraw.githubusercontent.com%2Famaharana%2Fnear-smart-stock-contract%2Fmaster%2Fdiagrams%2FHighLevelArchitecture.drawio)
 
 Pre-requisites for building
 ===========================
