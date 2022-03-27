@@ -113,12 +113,45 @@ Edit `near-smart-stock-contract/neardev/dev-account` and `near-smart-stock-contr
 
 Run
 ===
+
+Contract
+--------
+Sample NEAR CLI commands to check that the contract are working as expected:
+
+```
+// see if total shares is set correctly
+near view stockcontract2.company-a.mtestaccount.testnet get_total_shares
+
+// try increasing total shares by direct call - should fail
+near call stockcontract2.company-a.mtestaccount.testnet issue_new_shares '{"num_new_shares": 10}' --accountId admin2.company-a.mtestaccount.testnet
+
+// see open request IDs in multisig contract
+near view multisig.company-a.mtestaccount.testnet list_request_ids
+
+// create a new multisig request to increase total shares (and provide the first confirmation)
+near repl -s ./contract/create-multisig-request.js
+
+// verify request
+near view multisig.company-a.mtestaccount.testnet list_request_ids
+near view multisig.company-a.mtestaccount.testnet get_confirmations '{"request_id":2}'
+
+
+// try to confirm confirm the request as second user who is not in the list of confirmers provided during init - should fail
+near call multisig.company-a.mtestaccount.testnet confirm '{"request_id":2}' --account_id admin2.company1.mtestaccount.testnet
+
+// confirm second request correctly
+near call multisig.company-a.mtestaccount.testnet confirm '{"request_id":2}' --account_id admin2.company-a.mtestaccount.testnet
+
+// verify that multisig request successfully updated total shares
+near view stockcontract2.company-a.mtestaccount.testnet get_total_shares
+```
+
+UI
+--
+
 Start the local development server: `yarn start` (see `package.json` for a
-   full list of `scripts` you can run with `yarn`)
-
-Now you'll have a local development environment backed by the NEAR TestNet!
-
-
+   full list of `scripts` you can run with `yarn`). You can test buying and selling shares using the UI.
+   
 Troubleshooting
 ===============
 
