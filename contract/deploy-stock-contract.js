@@ -1,12 +1,13 @@
 const { exit } = require('process');
 const fs = require('fs');
+const { async } = require('regenerator-runtime');
 
 /**
  * Run from project root directory. Example command and arguments:
  *      near repl -s ./contract/deploy-stock-contract.js -- company-a.mtestaccount.testnet stockcontract1 multisig.commpany-a.mtestaccount.testnet
  */
 
-var arguments = process.argv ;
+var arguments = process.argv;
 // console.log("# arguments: " + arguments.length);
 // arguments.forEach(arg => console.log(arg));
 
@@ -24,16 +25,39 @@ const initArgs = {
     "allowed_admin_caller": arguments[8]
 };
 
-exports.main = async function(context) {
+exports.main = async function (context) {
     const { near, nearAPI } = context;
     const account = await near.account(deployerAccountName);
-    account.signAndSendTransaction(
-        contractName,
-        [
-            nearAPI.transactions.createAccount(),
-            nearAPI.transactions.transfer("100000000000000000000000000"),
-            nearAPI.transactions.deployContract(fs.readFileSync("contract/target/wasm32-unknown-unknown/debug/greeter.wasm")),
-            nearAPI.transactions.functionCall("new", Buffer.from(JSON.stringify(initArgs)), 10000000000000, "0"),
-        ]
-    ).then(result => console.log(result));
+    const deployerKey = (await account.findAccessKey()).publicKey;
+    console.log("Deployer account public key: " + deployerKey.toString());
+    const contractCode = fs.readFileSync("contract/target/wasm32-unknown-unknown/debug/greeter.wasm");
+
+    if (await accountExists(contractName)) {
+        await account.signAndSendTransaction(contractName, [
+            nearAPI.transactions.deployContract(contractCode)
+        ]);
+    } else {
+        // TODO: does not work - the publickey does not allow redeployment 🤷‍♂️
+        await account.createAndDeployContract(contractName, deployerKey, contractCode, "100000000000000000000000000");
+    }
+
+    await account.signAndSendTransaction(contractName, [
+        nearAPI.transactions.functionCall("new", Buffer.from(JSON.stringify(initArgs)), 10000000000000, "0")
+    ]);
+    
+    // check if account exists
+    async function accountExists(accountName) {
+        const account = await near.account(accountName);
+        try {
+            await account.getAccountBalance();
+            return true;
+        } catch (e) {
+            if (e.type === 'AccountDoesNotExist') {
+                return false;
+            }
+
+            // bubble up all other exceptions
+            throw e;
+        };
+    }
 }
