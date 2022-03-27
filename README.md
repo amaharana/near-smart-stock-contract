@@ -107,7 +107,7 @@ Privileged calls will only be accepted from `multisig.commpany-a.mtestaccount.te
 
 ```
 cd near-smart-stock-contract
-near repl -s ./contract/deploy-stock-contract.js -- company-a.mtestaccount.testnet multisig.commpany-a.mtestaccount.testnet
+near repl -s ./contract/deploy-stock-contract.js -- company-a.mtestaccount.testnet multisig.company-a.mtestaccount.testnet
 ```
 Edit `near-smart-stock-contract/neardev/dev-account` and `near-smart-stock-contract/dev-account.env` and replace the contract name with `stockcontract.company-a.mtestaccount.testnet`.
 
