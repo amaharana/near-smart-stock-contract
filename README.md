@@ -103,7 +103,7 @@ const result = account.signAndSendTransaction(
 Stock Contract
 --------------
 This script will deploy the stock contract to `stockcontract.company-a.mtestaccount.testnet` and initialize it with defaults. 
-Privileged calls will only be accepted from `multisig.commpany-a.mtestaccount.testnet`.
+Privileged calls will only be accepted from `multisig.company-a.mtestaccount.testnet`.
 
 ```
 cd near-smart-stock-contract
