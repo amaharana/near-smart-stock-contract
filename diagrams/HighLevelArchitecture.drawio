@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2022-03-25T13:19:53.305Z" agent="5.0 (Macintosh)" etag="0GRfDYyZOyyY1N2nIqFM" version="17.2.2" type="github">
+<mxfile host="app.diagrams.net" modified="2022-03-25T13:35:32.461Z" agent="5.0 (Macintosh)" etag="CfPx0_i2ab3cS5NAiUfn" version="17.2.2" type="github">
   <diagram id="-hN-MSK7Q1_RvColJM6n" name="Page-1">
     <mxGraphModel dx="1623" dy="3129" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -6,7 +6,7 @@
         <mxCell id="1" parent="0" />
         <UserObject label="" link="https://g.foolcdn.com/art/companylogos/square/link.png" id="Oci5rgU2LHDsX-qW9czk-28">
           <mxCell style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-            <mxGeometry x="70" y="-1190" width="660" height="820" as="geometry" />
+            <mxGeometry x="70" y="-1190" width="740" height="860" as="geometry" />
           </mxCell>
         </UserObject>
         <mxCell id="Oci5rgU2LHDsX-qW9czk-17" value="Privileged Method Calls" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="Oci5rgU2LHDsX-qW9czk-1" target="Oci5rgU2LHDsX-qW9czk-2" edge="1">
@@ -97,15 +97,14 @@
         <mxCell id="6cK30qrrgWEB5mEtdJcq-14" value="dApp admin web interface" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;dashPattern=1 2;" vertex="1" parent="1">
           <mxGeometry x="515" y="-950" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="6cK30qrrgWEB5mEtdJcq-29" value="" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;dashPattern=1 2;" vertex="1" parent="1">
-          <mxGeometry x="515" y="-540" width="120" height="110" as="geometry" />
-        </mxCell>
-        <mxCell id="6cK30qrrgWEB5mEtdJcq-16" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://g.foolcdn.com/art/companylogos/square/link.png;dashed=1;dashPattern=1 2;" vertex="1" parent="1">
-          <mxGeometry x="526" y="-530" width="100" height="100" as="geometry" />
-        </mxCell>
-        <mxCell id="6cK30qrrgWEB5mEtdJcq-17" value="Oracle: Price feed" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;dashed=1;dashPattern=1 2;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;startArrow=block;startFill=1;" edge="1" parent="1" source="Oci5rgU2LHDsX-qW9czk-2" target="6cK30qrrgWEB5mEtdJcq-29">
+        <mxCell id="6cK30qrrgWEB5mEtdJcq-17" value="Oracle: Price feed" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;dashed=1;dashPattern=1 2;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;startArrow=block;startFill=1;" edge="1" parent="1" source="Oci5rgU2LHDsX-qW9czk-2" target="6cK30qrrgWEB5mEtdJcq-29">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="580" y="-560" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="557" y="-560" />
+              <mxPoint x="440" y="-560" />
+              <mxPoint x="440" y="-518" />
+            </Array>
           </mxGeometry>
         </mxCell>
         <mxCell id="6cK30qrrgWEB5mEtdJcq-28" value="" style="group" vertex="1" connectable="0" parent="1">
@@ -125,6 +124,35 @@
         </mxCell>
         <mxCell id="6cK30qrrgWEB5mEtdJcq-27" value="For future" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;dashed=1;dashPattern=1 2;" vertex="1" parent="6cK30qrrgWEB5mEtdJcq-28">
           <mxGeometry x="60" y="30" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6cK30qrrgWEB5mEtdJcq-37" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="635" y="-518" width="130" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6cK30qrrgWEB5mEtdJcq-35" value="" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;dashPattern=1 2;" vertex="1" parent="6cK30qrrgWEB5mEtdJcq-37">
+          <mxGeometry width="130" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6cK30qrrgWEB5mEtdJcq-33" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://assets-global.website-files.com/5f15b505dd58c1501a49d387/61a88f3d1d6f3b5b83479552_Near%20Protocol%203D%20coin.png;" vertex="1" parent="6cK30qrrgWEB5mEtdJcq-37">
+          <mxGeometry x="17.333333333333336" width="95.33333333333334" height="95.33333333333334" as="geometry" />
+        </mxCell>
+        <mxCell id="6cK30qrrgWEB5mEtdJcq-34" value="NEP-141 Fungible Token" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;dashed=1;dashPattern=1 2;fontSize=14;" vertex="1" parent="6cK30qrrgWEB5mEtdJcq-37">
+          <mxGeometry x="6.666666666666668" y="98.33333333333334" width="112.66666666666667" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="6cK30qrrgWEB5mEtdJcq-38" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="370" y="-518" width="141.82" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6cK30qrrgWEB5mEtdJcq-29" value="" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;dashPattern=1 2;" vertex="1" parent="6cK30qrrgWEB5mEtdJcq-38">
+          <mxGeometry width="141.82" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6cK30qrrgWEB5mEtdJcq-16" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://g.foolcdn.com/art/companylogos/square/link.png;dashed=1;dashPattern=1 2;" vertex="1" parent="6cK30qrrgWEB5mEtdJcq-38">
+          <mxGeometry x="13.000166666666667" y="11.818181818181818" width="118.18181818181819" height="118.18181818181819" as="geometry" />
+        </mxCell>
+        <mxCell id="6cK30qrrgWEB5mEtdJcq-39" value="&lt;font style=&quot;font-size: 12px&quot;&gt;Tokens for distribution&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;dashed=1;dashPattern=1 2;fontSize=18;startArrow=none;startFill=0;endArrow=block;endFill=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Oci5rgU2LHDsX-qW9czk-2" target="6cK30qrrgWEB5mEtdJcq-33">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="593" y="-560" />
+              <mxPoint x="700" y="-560" />
+            </Array>
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>
