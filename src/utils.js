@@ -5,6 +5,9 @@ const nearConfig = getConfig(process.env.NODE_ENV || 'development')
 
 // Initialize contract & set global variables
 export async function initContract() {
+  
+  console.dir(nearConfig);
+
   // Initialize connection to the NEAR testnet
   const near = await connect(Object.assign({ deps: { keyStore: new keyStores.BrowserLocalStorageKeyStore() } }, nearConfig))
 

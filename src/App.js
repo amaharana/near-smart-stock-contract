@@ -50,14 +50,7 @@ export default function App() {
     // Pass a variable to specify "run when this variable state changes."
     [contractCallRefreshFlag]
   )
-
-  React.useEffect(
-    () => {
-      fieldsetForBuy.disabled = formsDisabled
-      fieldsetForSell.disabled = formsDisabled
-    }, [formsDisabled]
-  )
-
+  
   // if not signed in, return early with sign-in prompt
   if (!window.walletConnection.isSignedIn()) {
     return (

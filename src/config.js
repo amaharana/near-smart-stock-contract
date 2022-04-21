@@ -1,10 +1,16 @@
-const CONTRACT_NAME = process.env.CONTRACT_NAME ||'near-smart-stock-contract'
+// TODO: Need to figure out how to configure env variables for github pages.
+// Until then, hardcode to use this particular contract.
+// const CONTRACT_NAME = process.env.CONTRACT_NAME ||'near-smart-stock-contract'
+const CONTRACT_NAME = 'stockcontract2.company-a.mtestaccount.testnet';
 
 function getConfig(env) {
   switch (env) {
 
   case 'production':
   case 'mainnet':
+  // TODO: Need to figure out how to configure env variables for github pages.
+  // Until then, hardcode to use testnet.
+  /*
     return {
       networkId: 'mainnet',
       nodeUrl: 'https://rpc.mainnet.near.org',
@@ -13,6 +19,7 @@ function getConfig(env) {
       helperUrl: 'https://helper.mainnet.near.org',
       explorerUrl: 'https://explorer.mainnet.near.org',
     }
+  */
   case 'development':
   case 'testnet':
     return {
